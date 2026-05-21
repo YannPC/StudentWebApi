@@ -1,41 +1,63 @@
+﻿using Microsoft.Data.SqlClient;
+using StudentApi;
+
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+// Your connection string
+string connectionString =
+    "Server=.\\SQLEXPRESS;Database=MyFirstDB;Integrated Security=True;TrustServerCertificate=True;";
 
-app.UseHttpsRedirection();
-
-var summaries = new[]
+// GET /students  → returns all students as JSON
+app.MapGet("/students", () =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    var students = new List<Student>();
 
-app.MapGet("/weatherforecast", () =>
+    using SqlConnection connection = new SqlConnection(connectionString);
+    connection.Open();
+
+    string query = "SELECT Id, Name, Age, Grade FROM Students";
+    using SqlCommand command = new SqlCommand(query, connection);
+    using SqlDataReader reader = command.ExecuteReader();
+
+    while (reader.Read())
+    {
+        students.Add(new Student
+        {
+            Id = reader.GetInt32(0),
+            Name = reader.GetString(1),
+            Age = reader.GetInt32(2),
+            Grade = reader.GetString(3)
+        });
+    }
+
+    return Results.Ok(students);
+});
+
+// GET /students/{id}  → returns one student by ID
+app.MapGet("/students/{id}", (int id) =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+    using SqlConnection connection = new SqlConnection(connectionString);
+    connection.Open();
+
+    string query = "SELECT Id, Name, Age, Grade FROM Students WHERE Id = @Id";
+    using SqlCommand command = new SqlCommand(query, connection);
+    command.Parameters.AddWithValue("@Id", id);
+    using SqlDataReader reader = command.ExecuteReader();
+
+    if (reader.Read())
+    {
+        var student = new Student
+        {
+            Id = reader.GetInt32(0),
+            Name = reader.GetString(1),
+            Age = reader.GetInt32(2),
+            Grade = reader.GetString(3)
+        };
+        return Results.Ok(student);
+    }
+
+    return Results.NotFound($"Student with ID {id} not found.");
+});
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

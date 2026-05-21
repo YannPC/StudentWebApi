@@ -1,6 +1,19 @@
 @StudentApi_HostAddress = http://localhost:5116
 
-GET {{StudentApi_HostAddress}}/weatherforecast/
+### Get all students
+GET {{StudentApi_HostAddress}}/students
+Accept: application/json
+
+###
+
+### Get student by ID = 1
+GET {{StudentApi_HostAddress}}/students/1
+Accept: application/json
+
+###
+
+### Get student by ID = 2
+GET {{StudentApi_HostAddress}}/students/2
 Accept: application/json
 
 ###
