@@ -40,6 +40,7 @@ app.MapGet("/students", () =>
         {
             Id = reader.GetInt32(0),
             Name = reader.GetString(1),
+            LastName = reader.GetString(1), 
             Age = reader.GetInt32(2),
             Grade = reader.GetString(3)
         });
@@ -65,6 +66,7 @@ if (reader.Read())
         {
             Id = reader.GetInt32(0),
             Name = reader.GetString(1),
+            LastName = reader.GetString(1),
             Age = reader.GetInt32(2),
             Grade = reader.GetString(3)
         };
