@@ -30,7 +30,7 @@ app.MapGet("/students", () =>
     using SqlConnection connection = new SqlConnection(connectionString);
     connection.Open();
 
-    string query = "SELECT Id, FirstName, Age, Grade, LastName FROM Students";
+    string query = "SELECT Id, FirstName, Age, Grade, LastName FROM Students"; 
     using SqlCommand command = new SqlCommand(query, connection);
     using SqlDataReader reader = command.ExecuteReader();
 
@@ -42,7 +42,7 @@ app.MapGet("/students", () =>
             FirstName = reader.GetString(1),
             Age = reader.GetInt32(2),
             Grade = reader.GetString(3),
-            LastName = reader.GetString(1)
+            LastName = reader.GetString(4)
 
         });
     }
@@ -56,8 +56,8 @@ app.MapGet("/students/{id}", (int id) =>
 using SqlConnection connection = new SqlConnection(connectionString);
 connection.Open();
 
-string query = "SELECT Id, FirstName, Age, Grade, LastName FROM Students WHERE Id = @Id";
-using SqlCommand command = new SqlCommand(query, connection);
+    string query = "SELECT Id, FirstName, Age, Grade, LastName FROM Students WHERE Id = @Id";
+    using SqlCommand command = new SqlCommand(query, connection);
 command.Parameters.AddWithValue("@Id", id);
 using SqlDataReader reader = command.ExecuteReader();
 
@@ -69,7 +69,7 @@ if (reader.Read())
             FirstName = reader.GetString(1),
             Age = reader.GetInt32(2),
             Grade = reader.GetString(3),
-            LastName = reader.GetString(1)
+            LastName = reader.GetString(4)
         };
 return Results.Ok(student);
  }
